@@ -1,16 +1,24 @@
-# Sistemas de Inferência Fuzzy (FIS)
+# Fuzzy Lab
 
 Sistema de suporte à decisão agrícola que utiliza lógica fuzzy com regras do tipo **SE-ENTÃO** para recomendar janelas de pulverização, monitorar estresse hídrico, sugerir irrigação e estimar produtividade, com base em variáveis climáticas.
 
-## Método
-
-**Mamdani** — o mais intuitivo e próximo do raciocínio humano. Tanto as entradas quanto as saídas são conjuntos fuzzy.
-> Ex: *"Se a temperatura é ideal e o vento é calmo e não há chuva, então a janela de pulverização está disponível"*.
-É o método mais indicado para sistemas de controle e recomendação baseados em especialistas.
-
 ## O que é?
 
-Notebook Jupyter (Python) que implementa um **Sistema de Inferência Fuzzy** para análise de condições climáticas aplicada à agricultura de precisão.
+Um pacote modular em Python que implementa **Sistemas de Inferência Fuzzy (FIS)**, **ANFIS** e análise de **séries temporais** para agricultura de precisão.
+
+## Estrutura do projeto
+
+```
+fuzzy-lab/
+├── src/fuzzylab/           # Pacote principal
+│   ├── fis/                # FIS Mamdani
+│   ├── anfis/              # Redes neuro-fuzzy adaptativas
+│   └── timeseries/         # Análise de séries temporais
+├── notebooks/              # Notebooks de experimentação
+├── data/raw/               # Dados brutos
+├── tests/                  # Testes unitários
+└── requirements-*.txt      # Dependências por módulo
+```
 
 ## Tecnologias
 
@@ -19,7 +27,10 @@ Notebook Jupyter (Python) que implementa um **Sistema de Inferência Fuzzy** par
 | Python | Linguagem principal |
 | [scikit-fuzzy](https://pythonhosted.org/scikit-fuzzy/) | Motor de inferência fuzzy (Mamdani) |
 | NumPy | Manipulação de universos de discurso |
-| Jupyter Notebook | Ambiente de desenvolvimento |
+| PyTorch | Redes neuro-fuzzy (ANFIS) |
+| tslearn / Pandas | Análise de séries temporais |
+| pytest | Testes unitários |
+| Jupyter Notebook | Ambiente de experimentação |
 
 ## Variáveis
 
@@ -36,19 +47,37 @@ Notebook Jupyter (Python) que implementa um **Sistema de Inferência Fuzzy** par
 - `Recomendação de Irrigação`
 - `Produtividade Estimada`
 
+## Instalação
+
+```bash
+# FIS Mamdani
+pip install -r requirements-fis.txt
+
+# ANFIS (redes neuro-fuzzy)
+pip install -r requirements-anfis.txt
+
+# Séries temporais
+pip install -r requirements-timeseries.txt
+
+# Desenvolvimento (testes, notebooks)
+pip install -r requirements-dev.txt
+```
+
 ## Estágio do projeto
 
-**Em andamento.** Estrutura base criada com antecedentes, consequentes e funções de pertinência definidos.
+**Em andamento.** Estrutura modular criada com FIS Mamdani funcional para recomendação de pulverização.
 
 - [x] Definição dos antecedentes e consequentes
 - [x] Funções de pertinência (automf com 7 conjuntos)
-- [x] Primeira regra de pulverização (`janela_disponivel`)
-- [ ] Regras para `atenção` e `proibida` na pulverização
+- [x] Regras completas de pulverização (`janela_disponivel`, `atencao`, `proibida`)
+- [x] Estrutura modular do pacote (`fis`, `anfis`, `timeseries`)
 - [ ] Regras para estresse hídrico, irrigação e produtividade
+- [ ] Implementação do módulo ANFIS
+- [ ] Implementação do módulo de séries temporais
 - [ ] Validação dos intervalos com literatura técnica e climatologia regional
 
 ## Problemas conhecidos
 
 - Os intervalos dos universos de discurso (`np.arange`) precisam ser confirmados com base na climatologia registrada da região e literatura técnica agronômica.
-- As regras de `atenção` e `proibida` para pulverização ainda não foram implementadas.
 - Os intervalos para `bet_productivity` precisam de revisão criteriosa com literatura técnica.
+- Módulos ANFIS e timeseries ainda não implementados (apenas estrutura de diretórios).
