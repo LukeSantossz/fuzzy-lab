@@ -6,9 +6,9 @@ from fuzzylab.fis.mamdani.definitions import (
     bet_productivity,
     delta_t,
     humidity,
-    irr_recomendation,
+    irr_recommendation,
     rain,
-    spray_recomendation,
+    spray_recommendation,
     temperature,
     water_stress,
     wind,
@@ -23,21 +23,21 @@ def spray_rules():
             & (rain["seco"] | rain["trace"])
             & humidity["ideal"]
             & temperature["ideal"],
-            spray_recomendation["janela_disponivel"],
+            spray_recommendation["janela_disponivel"],
         ),
         ctrl.Rule(
             (delta_t["aceitavel"] | delta_t["atencao"])
             & rain["trace"]
             & (humidity["seco"] | humidity["umido"])
             & (temperature["ameno"] | temperature["quente"]),
-            spray_recomendation["atencao"],
+            spray_recommendation["atencao"],
         ),
         ctrl.Rule(
             wind["atencao_pulv"]
             & (rain["seco"] | rain["trace"])
             & humidity["ideal"]
             & temperature["ideal"],
-            spray_recomendation["atencao"],
+            spray_recommendation["atencao"],
         ),
         ctrl.Rule(
             rain["leve"]
@@ -47,17 +47,17 @@ def spray_rules():
                 | wind["ideal_pulv"]
                 | wind["moderado"]
             ),
-            spray_recomendation["atencao"],
+            spray_recommendation["atencao"],
         ),
         ctrl.Rule(
             temperature["frio"]
             & (delta_t["ideal_pulv"] | delta_t["aceitavel"])
             & (rain["seco"] | rain["trace"]),
-            spray_recomendation["atencao"],
+            spray_recommendation["atencao"],
         ),
         ctrl.Rule(
             humidity["deserto"] | humidity["critico_seco"],
-            spray_recomendation["atencao"],
+            spray_recommendation["atencao"],
         ),
         ctrl.Rule(
             (delta_t["critico_pulv"] | delta_t["proibido"])
@@ -67,25 +67,25 @@ def spray_rules():
                 | rain["extrema"]
                 | rain["moderada"]
             ),
-            spray_recomendation["proibida"],
+            spray_recommendation["proibida"],
         ),
         ctrl.Rule(
             delta_t["inversao_termica"] | delta_t["extremo"],
-            spray_recomendation["proibida"],
+            spray_recommendation["proibida"],
         ),
         ctrl.Rule(
             wind["tempestade"] | wind["forte"] | wind["muito_forte"],
-            spray_recomendation["proibida"],
+            spray_recommendation["proibida"],
         ),
         ctrl.Rule(
             temperature["frio_extremo"]
             | temperature["critico"]
             | temperature["estresse_termico"],
-            spray_recomendation["proibida"],
+            spray_recommendation["proibida"],
         ),
         ctrl.Rule(
             humidity["saturado"] | humidity["condensacao"],
-            spray_recomendation["proibida"],
+            spray_recommendation["proibida"],
         ),
     ]
 
@@ -179,9 +179,9 @@ def irrigation_rules():
     (encadeamento no mesmo ControlSystem; mínimo duas regras, aqui três).
     """
     return [
-        ctrl.Rule(water_stress["baixo"], irr_recomendation["desnecessaria"]),
-        ctrl.Rule(water_stress["medio"], irr_recomendation["opcional"]),
-        ctrl.Rule(water_stress["alto"], irr_recomendation["recomendada"]),
+        ctrl.Rule(water_stress["baixo"], irr_recommendation["desnecessaria"]),
+        ctrl.Rule(water_stress["medio"], irr_recommendation["opcional"]),
+        ctrl.Rule(water_stress["alto"], irr_recommendation["recomendada"]),
     ]
 
 
@@ -195,7 +195,7 @@ def combined_rules():
             & wind["moderado"]
             & delta_t["aceitavel"],
             (
-                spray_recomendation["janela_disponivel"],
+                spray_recommendation["janela_disponivel"],
                 bet_productivity["medio"],
             ),
         )

@@ -63,11 +63,11 @@ delta_t.automf(
     ],
 )
 
-spray_recomendation = ctrl.Consequent(np.arange(0, 11, 1), "sp")
-spray_recomendation["proibida"] = fuzz.trimf(spray_recomendation.universe, [0, 0, 4])
-spray_recomendation["atencao"] = fuzz.trimf(spray_recomendation.universe, [3, 5, 7])
-spray_recomendation["janela_disponivel"] = fuzz.trimf(
-    spray_recomendation.universe, [6, 10, 10]
+spray_recommendation = ctrl.Consequent(np.arange(0, 11, 1), "sp")
+spray_recommendation["proibida"] = fuzz.trimf(spray_recommendation.universe, [0, 0, 4])
+spray_recommendation["atencao"] = fuzz.trimf(spray_recommendation.universe, [3, 5, 7])
+spray_recommendation["janela_disponivel"] = fuzz.trimf(
+    spray_recommendation.universe, [6, 10, 10]
 )
 
 water_stress = ctrl.Consequent(np.arange(0, 1.1, 0.1), "wh")
@@ -75,10 +75,10 @@ water_stress["baixo"] = fuzz.trimf(water_stress.universe, [0, 0.2, 1])
 water_stress["medio"] = fuzz.trimf(water_stress.universe, [0, 0.5, 1])
 water_stress["alto"] = fuzz.trimf(water_stress.universe, [0.5, 0.8, 1])
 
-irr_recomendation = ctrl.Consequent(np.arange(0, 11, 1), "ir")
-irr_recomendation["desnecessaria"] = fuzz.trimf(irr_recomendation.universe, [0, 3, 4])
-irr_recomendation["opcional"] = fuzz.trimf(irr_recomendation.universe, [0, 5, 6])
-irr_recomendation["recomendada"] = fuzz.trimf(irr_recomendation.universe, [5, 9, 10])
+irr_recommendation = ctrl.Consequent(np.arange(0, 11, 1), "ir")
+irr_recommendation["desnecessaria"] = fuzz.trimf(irr_recommendation.universe, [0, 3, 4])
+irr_recommendation["opcional"] = fuzz.trimf(irr_recommendation.universe, [0, 5, 6])
+irr_recommendation["recomendada"] = fuzz.trimf(irr_recommendation.universe, [5, 9, 10])
 
 bet_productivity = ctrl.Consequent(np.arange(0, 101, 1), "bp")
 bet_productivity["baixa"] = fuzz.trimf(bet_productivity.universe, [0, 10, 40])
