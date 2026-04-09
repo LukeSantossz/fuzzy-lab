@@ -1,83 +1,135 @@
-# Fuzzy Lab
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python&logoColor=white)
+![scikit-fuzzy](https://img.shields.io/badge/scikit--fuzzy-Mamdani-success)
+![PyTorch](https://img.shields.io/badge/PyTorch-ANFIS-EE4C2C?logo=pytorch&logoColor=white)
+![Status](https://img.shields.io/badge/status-in%20development-yellow)
 
-Sistema de suporte à decisão agrícola que utiliza lógica fuzzy com regras do tipo **SE-ENTÃO** para recomendar janelas de pulverização, monitorar estresse hídrico, sugerir irrigação e estimar produtividade, com base em variáveis climáticas.
+# fuzzy-lab
 
-## O que é?
+> Agricultural decision-support using fuzzy logic (IF–THEN rules), Mamdani FIS, ANFIS, and time-series analysis for spray windows, water stress, irrigation hints, and yield estimates driven by weather variables.
 
-Um pacote modular em Python que implementa **Sistemas de Inferência Fuzzy (FIS)**, **ANFIS** e análise de **séries temporais** para agricultura de precisão.
+## Overview
 
-## Estrutura do projeto
+Precision agriculture couples climate variables with operational limits (wind, humidity, rainfall, delta T). Crisp models are often too rigid; **fuzzy inference systems** encode uncertainty and field-aligned linguistic rules. This repository is a modular Python package: **Mamdani FIS** with [scikit-fuzzy](https://pythonhosted.org/scikit-fuzzy/), **ANFIS** with PyTorch, and a **time-series** layer (Pandas / tslearn), plus Jupyter notebooks for experiments and pytest for tests.
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Fuzzy inference | [scikit-fuzzy](https://pythonhosted.org/scikit-fuzzy/) (Mamdani), NumPy |
+| Neuro-fuzzy | PyTorch (ANFIS) |
+| Time series | Pandas, tslearn |
+| Testing | pytest |
+| Experimentation | Jupyter Notebook |
+| Visualization | matplotlib |
+
+## FIS linguistic domain
+
+**Antecedents (inputs):**
+
+| Variable | Universe | Sets (summary) |
+|----------|----------|----------------|
+| Temperature | 0–60 °C | frio_extremo → crítico (7) |
+| Humidity | 0–100 % | deserto → condensação (7) |
+| Rainfall | 0–500 mm | seco → extrema (7) |
+| Wind | 0–150 km/h | calmo → tempestade (7) |
+| Delta T | 0–40 °C | inversão_térmica → extremo (7) |
+
+**Consequents (outputs):** spray recommendation (proibida / atencao / janela_disponivel), water stress, irrigation recommendation, estimated productivity.
+
+## Getting Started
+
+### Prerequisites
+
+- Python 3.10 or newer
+- pip
+- (Optional) CUDA for GPU-accelerated PyTorch in the ANFIS module
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/<username>/fuzzy-lab.git
+cd fuzzy-lab
+
+# Create and activate a virtual environment
+python -m venv venv
+source venv/bin/activate   # Linux / macOS
+venv\Scripts\activate      # Windows
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Editable install (recommended — import name: fuzzylab)
+pip install -e .
+```
+
+Without `pip install -e .`, add `src` to `PYTHONPATH` or rely on the notebook snippet that prepends `.../src` to `sys.path`.
+
+### Running
+
+```bash
+# Start the Jupyter server
+jupyter notebook
+
+# Main FIS experiment notebook:
+# notebooks/fis_mamdani.ipynb
+```
+
+```bash
+# Tests
+pytest tests/
+```
+
+**Environment variables:** the codebase does not require any at this stage. For PyTorch on GPU, follow upstream guidance (`CUDA_VISIBLE_DEVICES`, etc.) for your setup.
+
+## Project Structure
 
 ```
 fuzzy-lab/
-├── src/fuzzylab/           # Pacote principal
-│   ├── fis/                # FIS Mamdani
-│   ├── anfis/              # Redes neuro-fuzzy adaptativas
-│   └── timeseries/         # Análise de séries temporais
-├── notebooks/              # Notebooks de experimentação
-├── data/raw/               # Dados brutos
-├── tests/                  # Testes unitários
-└── requirements-*.txt      # Dependências por módulo
+├── notebooks/
+│   └── fis_mamdani.ipynb          # Mamdani FIS experiments
+├── data/
+│   └── raw/                       # raw inputs (e.g. .gitkeep)
+├── src/
+│   └── fuzzylab/
+│       ├── fis/
+│       │   └── mamdani/           # definitions + rules (Mamdani / scikit-fuzzy)
+│       ├── anfis/                 # ANFIS (placeholder)
+│       └── timeseries/            # time series (placeholder)
+├── tests/
+│   └── test_mamdani_water_irrigation.py
+├── pyproject.toml
+├── venv/                          # local virtualenv (not versioned)
+├── .gitignore
+├── requirements.txt
+└── README.md
 ```
 
-## Tecnologias
+## Current Status
 
-| Tecnologia | Uso |
-|---|---|
-| Python | Linguagem principal |
-| [scikit-fuzzy](https://pythonhosted.org/scikit-fuzzy/) | Motor de inferência fuzzy (Mamdani) |
-| NumPy | Manipulação de universos de discurso |
-| PyTorch | Redes neuro-fuzzy (ANFIS) |
-| tslearn / Pandas | Análise de séries temporais |
-| pytest | Testes unitários |
-| Jupyter Notebook | Ambiente de experimentação |
+**Status: in development — initial sprint**
 
-## Variáveis
+| Stage | Status |
+|-------|--------|
+| Linguistic antecedents and consequents | Done |
+| Membership functions (automf, 7 sets) | Done |
+| Full spray rules (`janela_disponivel`, `atencao`, `proibida`) | Done |
+| Modular package layout (`fis`, `anfis`, `timeseries`) | Done |
+| Rules for water stress and irrigation | Done |
+| Rules for productivity (yield) | Pending |
+| ANFIS module implementation | Pending |
+| Time-series module implementation | Pending |
+| Validating universes with literature and regional climate data | Pending |
 
-**Antecedentes (entradas):**
-- `Temperatura` — 0 a 60 °C (7 conjuntos: frio_extremo → crítico)
-- `Umidade` — 0 a 100 % (7 conjuntos: deserto → condensação)
-- `Chuva` — 0 a 500 mm (7 conjuntos: seco → extrema)
-- `Vento` — 0 a 150 km/h (7 conjuntos: calmo → tempestade)
-- `Delta T` — 0 a 40 °C (7 conjuntos: inversão_térmica → extremo)
+**Next steps:**
 
-**Consequentes (saídas):**
-- `Recomendação de Pulverização` — proibida / atenção / janela_disponível
-- `Estresse Hídrico`
-- `Recomendação de Irrigação`
-- `Produtividade Estimada`
+1. Extend the rule base for productivity (`bet_productivity`) and refine FIS coverage.
+2. Flesh out the ANFIS pipeline and associated tests.
+3. Implement time-series workflows and tie-ins to `data/raw/`.
+4. Revisit discourse universes using field data and agronomic references.
 
-## Instalação
+## Known issues
 
-```bash
-# FIS Mamdani
-pip install -r requirements-fis.txt
-
-# ANFIS (redes neuro-fuzzy)
-pip install -r requirements-anfis.txt
-
-# Séries temporais
-pip install -r requirements-timeseries.txt
-
-# Desenvolvimento (testes, notebooks)
-pip install -r requirements-dev.txt
-```
-
-## Estágio do projeto
-
-**Em andamento.** Estrutura modular criada com FIS Mamdani funcional para recomendação de pulverização.
-
-- [x] Definição dos antecedentes e consequentes
-- [x] Funções de pertinência (automf com 7 conjuntos)
-- [x] Regras completas de pulverização (`janela_disponivel`, `atencao`, `proibida`)
-- [x] Estrutura modular do pacote (`fis`, `anfis`, `timeseries`)
-- [ ] Regras para estresse hídrico, irrigação e produtividade
-- [ ] Implementação do módulo ANFIS
-- [ ] Implementação do módulo de séries temporais
-- [ ] Validação dos intervalos com literatura técnica e climatologia regional
-
-## Problemas conhecidos
-
-- Os intervalos dos universos de discurso (`np.arange`) precisam ser confirmados com base na climatologia registrada da região e literatura técnica agronômica.
-- Os intervalos para `bet_productivity` precisam de revisão criteriosa com literatura técnica.
-- Módulos ANFIS e timeseries ainda não implementados (apenas estrutura de diretórios).
+- Universe bounds (`np.arange`) should be checked against regional climate records and technical literature.
+- Productivity-related intervals (`bet_productivity`) need a careful literature pass.
+- ANFIS and time-series modules are still mostly scaffolding; implementation and test coverage need to grow.

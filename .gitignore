@@ -29,4 +29,8 @@ Thumbs.db
 
 # AI
 .claude
+.cursor
+
+# Miscellaneous
 tutor.md
+review.md

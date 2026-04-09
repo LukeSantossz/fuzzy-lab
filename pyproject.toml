@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fuzzy-lab"
+version = "0.1.0"
+description = "Agricultural fuzzy inference (Mamdani) and related experiments"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy",
+    "scikit-fuzzy",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "notebook"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
