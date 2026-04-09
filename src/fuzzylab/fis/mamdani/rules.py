@@ -16,7 +16,7 @@ from fuzzylab.fis.mamdani.definitions import (
 
 
 def spray_rules():
-    """Task 3 — recomendação de pulverização."""
+    """Recomendação de pulverização."""
     return [
         ctrl.Rule(
             delta_t["ideal_pulv"]
@@ -175,7 +175,7 @@ def water_stress_rules():
 
 def irrigation_rules():
     """
-    Task 4 — recomendação de irrigação a partir dos termos de `water_stress`
+    Recomendação de irrigação a partir dos termos de `water_stress`
     (encadeamento no mesmo ControlSystem; mínimo duas regras, aqui três).
     """
     return [
@@ -186,7 +186,7 @@ def irrigation_rules():
 
 
 def combined_rules():
-    """Cenário de referência para pulverização e produtividade (Task 5)."""
+    """Cenário de referência para pulverização e produtividade."""
     return [
         ctrl.Rule(
             temperature["ideal"]
