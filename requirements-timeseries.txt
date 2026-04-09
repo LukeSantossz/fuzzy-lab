@@ -1,3 +1,0 @@
-scikit-fuzzy
-pandas 
-tslearn
