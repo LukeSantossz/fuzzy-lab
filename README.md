@@ -58,9 +58,12 @@ venv\Scripts\activate      # Windows
 
 # Install dependencies
 pip install -r requirements.txt
+
+# Editable install (recommended — import name: fuzzylab)
+pip install -e .
 ```
 
-To import the package from `src/` without an editable install, add `src` to `PYTHONPATH` (optional).
+Without `pip install -e .`, add `src` to `PYTHONPATH` or rely on the notebook snippet that prepends `.../src` to `sys.path`.
 
 ### Running
 
@@ -89,13 +92,13 @@ fuzzy-lab/
 │   └── raw/                       # raw inputs (e.g. .gitkeep)
 ├── src/
 │   └── fuzzylab/
-│       ├── fis/                   # Mamdani engine (engine, mamdani)
-│       ├── anfis/                 # ANFIS (e.g. clustering)
-│       └── timeseries/            # time-series analysis
+│       ├── fis/
+│       │   └── mamdani/           # definitions + rules (Mamdani / scikit-fuzzy)
+│       ├── anfis/                 # ANFIS (placeholder)
+│       └── timeseries/            # time series (placeholder)
 ├── tests/
-│   ├── test_fis.py
-│   ├── test_anfis.py
-│   └── test_timeseries.py
+│   └── test_mamdani_water_irrigation.py
+├── pyproject.toml
 ├── venv/                          # local virtualenv (not versioned)
 ├── .gitignore
 ├── requirements.txt
@@ -112,14 +115,15 @@ fuzzy-lab/
 | Membership functions (automf, 7 sets) | Done |
 | Full spray rules (`janela_disponivel`, `atencao`, `proibida`) | Done |
 | Modular package layout (`fis`, `anfis`, `timeseries`) | Done |
-| Rules for water stress, irrigation, and productivity | Pending |
+| Rules for water stress and irrigation | Done |
+| Rules for productivity (yield) | Pending |
 | ANFIS module implementation | Pending |
 | Time-series module implementation | Pending |
 | Validating universes with literature and regional climate data | Pending |
 
 **Next steps:**
 
-1. Extend the rule base for water stress, irrigation, and productivity.
+1. Extend the rule base for productivity (`bet_productivity`) and refine FIS coverage.
 2. Flesh out the ANFIS pipeline and associated tests.
 3. Implement time-series workflows and tie-ins to `data/raw/`.
 4. Revisit discourse universes using field data and agronomic references.

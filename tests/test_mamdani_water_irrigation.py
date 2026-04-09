@@ -2,7 +2,7 @@
 
 import pytest
 
-from fuzzy_lab.mamdani.rules import build_control_system_simulation
+from fuzzylab.fis.mamdani.rules import build_control_system_simulation
 
 
 def _simulate(*, temperatura, umidade, chuva, vento, delta_t):

@@ -2,7 +2,7 @@
 
 from skfuzzy import control as ctrl
 
-from fuzzy_lab.mamdani.definitions import (
+from fuzzylab.fis.mamdani.definitions import (
     bet_productivity,
     delta_t,
     humidity,
