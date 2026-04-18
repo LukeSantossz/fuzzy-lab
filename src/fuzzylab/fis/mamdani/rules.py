@@ -185,8 +185,69 @@ def irrigation_rules():
     ]
 
 
+def productivity_rules():
+    """
+    Regras de produtividade estimada (`bp`) baseadas em estresse hídrico
+    e condições climáticas. Três cenários: baixa, média e alta produtividade.
+    """
+    # Alta produtividade: estresse hídrico baixo + condições climáticas favoráveis
+    bp_alta_r1 = ctrl.Rule(
+        water_stress["baixo"]
+        & (temperature["ideal"] | temperature["ameno"])
+        & (humidity["ideal"] | humidity["umido"])
+        & (rain["leve"] | rain["moderada"]),
+        bet_productivity["alta"],
+    )
+
+    # Alta produtividade: clima ideal mesmo sem chuva recente (irrigação compensou)
+    bp_alta_r2 = ctrl.Rule(
+        water_stress["baixo"]
+        & temperature["ideal"]
+        & humidity["ideal"],
+        bet_productivity["alta"],
+    )
+
+    # Média produtividade: estresse hídrico médio ou condições parcialmente favoráveis
+    bp_medio_r1 = ctrl.Rule(
+        water_stress["medio"]
+        & (temperature["ameno"] | temperature["ideal"] | temperature["quente"])
+        & (humidity["seco"] | humidity["ideal"] | humidity["umido"]),
+        bet_productivity["medio"],
+    )
+
+    # Média produtividade: baixo estresse mas temperatura subótima
+    bp_medio_r2 = ctrl.Rule(
+        water_stress["baixo"]
+        & (temperature["frio"] | temperature["quente"]),
+        bet_productivity["medio"],
+    )
+
+    # Baixa produtividade: estresse hídrico alto
+    bp_baixa_r1 = ctrl.Rule(
+        water_stress["alto"],
+        bet_productivity["baixa"],
+    )
+
+    # Baixa produtividade: condições climáticas extremas independente do estresse
+    bp_baixa_r2 = ctrl.Rule(
+        (temperature["frio_extremo"] | temperature["critico"] | temperature["estresse_termico"])
+        | (humidity["deserto"] | humidity["condensacao"]),
+        bet_productivity["baixa"],
+    )
+
+    # Média produtividade: fallback para condições moderadas com chuva relevante
+    bp_medio_r3 = ctrl.Rule(
+        (rain["moderada"] | rain["forte"])
+        & (humidity["umido"] | humidity["saturado"])
+        & (temperature["ameno"] | temperature["ideal"] | temperature["frio"]),
+        bet_productivity["medio"],
+    )
+
+    return [bp_alta_r1, bp_alta_r2, bp_medio_r1, bp_medio_r2, bp_medio_r3, bp_baixa_r1, bp_baixa_r2]
+
+
 def combined_rules():
-    """Cenário de referência para pulverização e produtividade."""
+    """Cenário de referência para pulverização e produtividade (legado)."""
     return [
         ctrl.Rule(
             temperature["ideal"]
@@ -207,6 +268,7 @@ def all_rules():
         spray_rules()
         + water_stress_rules()
         + irrigation_rules()
+        + productivity_rules()
         + combined_rules()
     )
 
