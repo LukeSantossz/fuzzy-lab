@@ -2,7 +2,8 @@
 
 import pytest
 
-from fuzzylab.fis.mamdani.rules import build_control_system_simulation
+from fuzzylab.fis import build_system, run_inference
+from fuzzylab.fis.mamdani import build_control_system_simulation
 
 
 def _simulate(*, temperatura, umidade, chuva, vento, delta_t):
@@ -126,3 +127,53 @@ def test_productivity_inversely_correlated_with_water_stress():
 
     assert wh_seco > wh_favoravel, "Cenário seco deve ter maior estresse hídrico"
     assert bp_seco < bp_favoravel, "Cenário seco deve ter menor produtividade"
+
+
+def test_public_interface_build_system_and_run_inference():
+    """build_system() + run_inference() devem produzir um dict com as saídas."""
+    system = build_system()
+    outputs = run_inference(
+        system,
+        {
+            "Temperatura": 28.0,
+            "Umidade": 60.0,
+            "Chuva": 0.0,
+            "Vento": 10.0,
+            "Delta T": 8.0,
+        },
+    )
+    assert isinstance(outputs, dict)
+    for key in ("wh", "ir", "sp", "bp"):
+        assert key in outputs, f"output '{key}' ausente"
+        assert isinstance(outputs[key], float)
+    assert 0.0 <= outputs["wh"] <= 1.0
+    assert 0.0 <= outputs["ir"] <= 10.0
+    assert 0.0 <= outputs["sp"] <= 10.0
+    assert 0.0 <= outputs["bp"] <= 100.0
+
+
+def test_public_interface_rule_group_selection():
+    """Passar rule_groups deve limitar quais consequentes são produzidos.
+
+    As regras de water_stress e irrigation usam apenas Temperatura/Umidade/Chuva,
+    então o sistema resultante não aceita Vento/Delta T (comportamento correto
+    do skfuzzy: antecedentes fora do grafo do ControlSystem são rejeitados).
+    """
+    system = build_system({"rule_groups": ["water_stress", "irrigation"]})
+    outputs = run_inference(
+        system,
+        {
+            "Temperatura": 38.0,
+            "Umidade": 12.0,
+            "Chuva": 0.0,
+        },
+    )
+    assert "wh" in outputs and "ir" in outputs
+    # sp e bp não devem aparecer pois suas regras não foram incluídas
+    assert "sp" not in outputs
+    assert "bp" not in outputs
+
+
+def test_public_interface_unknown_group_raises():
+    with pytest.raises(ValueError):
+        build_system({"rule_groups": ["nao_existe"]})
