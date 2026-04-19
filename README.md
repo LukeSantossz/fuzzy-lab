@@ -34,7 +34,28 @@ Precision agriculture couples climate variables with operational limits (wind, h
 | Wind | 0–150 km/h | calmo → tempestade (7) |
 | Delta T | 0–40 °C | inversão_térmica → extremo (7) |
 
-**Consequents (outputs):** spray recommendation (proibida / atencao / janela_disponivel), water stress, irrigation recommendation, estimated productivity.
+**Consequents (outputs):** spray recommendation `sp` (proibida / atencao / janela_disponivel), water stress `wh` (baixo / medio / alto), irrigation recommendation `ir` (desnecessaria / opcional / recomendada), estimated productivity `bp` (baixa / medio / alta).
+
+**Public interface** (re-exported from `fuzzylab.fis`):
+
+```python
+from fuzzylab.fis import build_system, run_inference
+
+system = build_system()
+outputs = run_inference(
+    system,
+    {
+        "Temperatura": 28.0,
+        "Umidade": 60.0,
+        "Chuva": 0.0,
+        "Vento": 10.0,
+        "Delta T": 8.0,
+    },
+)
+# outputs -> {"wh": ..., "ir": ..., "sp": ..., "bp": ...}
+```
+
+`build_system(config)` optionally accepts `{"rule_groups": [...]}` to include only a subset of rule builders (`spray`, `water_stress`, `irrigation`, `productivity`, `combined`).
 
 ## Getting Started
 
@@ -73,11 +94,24 @@ jupyter notebook
 
 # Main FIS experiment notebook:
 # notebooks/fis_mamdani.ipynb
+# (membership-function plots and 3D control surfaces are saved under notebooks/figures/)
 ```
 
 ```bash
 # Tests
 pytest tests/
+```
+
+```python
+# Programmatic usage (no notebook required)
+from fuzzylab.fis import build_system, run_inference
+
+system = build_system()
+outputs = run_inference(
+    system,
+    {"Temperatura": 28.0, "Umidade": 60.0, "Chuva": 0.0, "Vento": 10.0, "Delta T": 8.0},
+)
+print(outputs)  # {"wh": ..., "ir": ..., "sp": ..., "bp": ...}
 ```
 
 **Environment variables:** the codebase does not require any at this stage. For PyTorch on GPU, follow upstream guidance (`CUDA_VISIBLE_DEVICES`, etc.) for your setup.
@@ -87,13 +121,15 @@ pytest tests/
 ```
 fuzzy-lab/
 ├── notebooks/
-│   └── fis_mamdani.ipynb          # Mamdani FIS experiments
+│   ├── fis_mamdani.ipynb          # Mamdani FIS experiments
+│   └── figures/                   # generated MF plots and control surfaces
 ├── data/
 │   └── raw/                       # raw inputs (e.g. .gitkeep)
 ├── src/
 │   └── fuzzylab/
 │       ├── fis/
-│       │   └── mamdani/           # definitions + rules (Mamdani / scikit-fuzzy)
+│       │   ├── mamdani.py         # Mamdani FIS module (scikit-fuzzy) — ACTIVE
+│       │   └── __init__.py        # re-exports build_system / run_inference
 │       ├── anfis/                 # ANFIS (placeholder)
 │       └── timeseries/            # time series (placeholder)
 ├── tests/
@@ -116,20 +152,23 @@ fuzzy-lab/
 | Full spray rules (`janela_disponivel`, `atencao`, `proibida`) | Done |
 | Modular package layout (`fis`, `anfis`, `timeseries`) | Done |
 | Rules for water stress and irrigation | Done |
-| Rules for productivity (yield) | Pending |
+| Rules for productivity (`bet_productivity`, 7 rules) | Done |
+| Public interface `build_system` / `run_inference` (flat `mamdani.py`) | Done |
+| Membership-function plots and 3D control surfaces (notebook) | Done |
 | ANFIS module implementation | Pending |
 | Time-series module implementation | Pending |
-| Validating universes with literature and regional climate data | Pending |
+| Calibrating universe bounds against regional climate data | Pending |
+| Calibrating productivity rules against field data | Pending |
 
 **Next steps:**
 
-1. Extend the rule base for productivity (`bet_productivity`) and refine FIS coverage.
-2. Flesh out the ANFIS pipeline and associated tests.
-3. Implement time-series workflows and tie-ins to `data/raw/`.
-4. Revisit discourse universes using field data and agronomic references.
+1. Flesh out the ANFIS pipeline and associated tests.
+2. Implement time-series workflows and tie-ins to `data/raw/`.
+3. Revisit discourse universes using field data and agronomic references.
+4. Calibrate productivity rules against experimental yield datasets.
 
 ## Known issues
 
 - Universe bounds (`np.arange`) should be checked against regional climate records and technical literature.
-- Productivity-related intervals (`bet_productivity`) need a careful literature pass.
+- Productivity rules now cover 7 scenarios but their thresholds still need calibration against experimental yield data.
 - ANFIS and time-series modules are still mostly scaffolding; implementation and test coverage need to grow.
