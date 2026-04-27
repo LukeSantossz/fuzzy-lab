@@ -130,20 +130,24 @@ fuzzy-lab/
 │       ├── fis/
 │       │   ├── mamdani.py         # Mamdani FIS module (scikit-fuzzy) — ACTIVE
 │       │   └── __init__.py        # re-exports build_system / run_inference
-│       ├── anfis/                 # ANFIS (placeholder)
+│       ├── anfis/
+│       │   ├── anfis.py           # AnfisNet (nn.Module) — stub
+│       │   ├── engine.py          # build_system / run_inference — stub
+│       │   └── __init__.py        # re-exports public interface
 │       └── timeseries/            # time series (placeholder)
 ├── tests/
-│   └── test_mamdani_water_irrigation.py
+│   ├── test_fis.py                # FIS scenario tests (ideal, storm, drought)
+│   ├── test_anfis.py              # ANFIS import and stub tests
+│   └── test_mamdani_water_irrigation.py  # boundary and ordering tests
 ├── pyproject.toml
-├── venv/                          # local virtualenv (not versioned)
-├── .gitignore
 ├── requirements.txt
+├── requirements-anfis.txt         # PyTorch deps for ANFIS module
 └── README.md
 ```
 
 ## Current Status
 
-**Status: in development — initial sprint**
+**Status: in development — Phase 1 complete**
 
 | Stage | Status |
 |-------|--------|
@@ -155,14 +159,16 @@ fuzzy-lab/
 | Rules for productivity (`bet_productivity`, 7 rules) | Done |
 | Public interface `build_system` / `run_inference` (flat `mamdani.py`) | Done |
 | Membership-function plots and 3D control surfaces (notebook) | Done |
-| ANFIS module implementation | Pending |
+| Unit tests for FIS scenarios (24 tests) | Done |
+| ANFIS subpackage scaffold (`AnfisNet`, stubs) | Done |
+| ANFIS training and inference implementation | Pending |
 | Time-series module implementation | Pending |
 | Calibrating universe bounds against regional climate data | Pending |
 | Calibrating productivity rules against field data | Pending |
 
 **Next steps:**
 
-1. Flesh out the ANFIS pipeline and associated tests.
+1. Implement ANFIS forward pass and training loop.
 2. Implement time-series workflows and tie-ins to `data/raw/`.
 3. Revisit discourse universes using field data and agronomic references.
 4. Calibrate productivity rules against experimental yield datasets.
@@ -171,4 +177,5 @@ fuzzy-lab/
 
 - Universe bounds (`np.arange`) should be checked against regional climate records and technical literature.
 - Productivity rules now cover 7 scenarios but their thresholds still need calibration against experimental yield data.
-- ANFIS and time-series modules are still mostly scaffolding; implementation and test coverage need to grow.
+- ANFIS subpackage is scaffolded with stubs; training and inference logic pending implementation.
+- Time-series module is placeholder only.
