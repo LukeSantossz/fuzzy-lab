@@ -1,0 +1,13 @@
+# Core
+numpy
+scikit-fuzzy
+
+# ANFIS (neural network)
+torch
+
+# Visualization
+matplotlib
+
+# Development
+pytest
+notebook
