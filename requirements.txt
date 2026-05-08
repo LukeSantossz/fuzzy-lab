@@ -1,8 +1,13 @@
-matplotlib
-notebook
+# Core
 numpy
-pandas
-pytest
 scikit-fuzzy
+
+# ANFIS (neural network)
 torch
-tslearn
+
+# Visualization
+matplotlib
+
+# Development
+pytest
+notebook
