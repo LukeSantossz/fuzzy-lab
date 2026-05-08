@@ -28,6 +28,7 @@
 | 8 | 2026-04-20 | TASK-008 — Testes + README | minor | 4 arquivos — tests, README | aprovado | 24 testes passando |
 | 9 | 2026-04-25 | TASK-009 — Scaffold ANFIS | minor | 5 arquivos — anfis | aprovado | Stubs NotImplementedError |
 | 10 | 2026-05-07 | TASK-000 — Bootstrap .claude | major | 2 arquivos — .claude | aprovado | Hooks instalados, histórico sincronizado |
+| 11 | 2026-05-07 | TASK-011 — Limpeza estrutura | minor | 6 arquivos — src, tests, docs | aprovado | 3 vazios deletados, CLAUDE.md simplificado |
 
 ## Estado da Codebase
 
@@ -39,7 +40,7 @@
 - **Dependências alteradas recentemente:** nenhuma
 - **Testes passando:** sim — 24 testes (pytest)
 - **Divergências externas pendentes:** nenhuma
-- **Última task concluída:** TASK-000 — Bootstrap .claude
+- **Última task concluída:** TASK-011 — Limpeza estrutura
 
 ## Pendências Conhecidas
 
