@@ -169,7 +169,7 @@ Auditoria identificou arquivos vazios sem propósito, duplicação entre CLAUDE.
 ---
 
 ### TASK-010
-- **Status:** pendente
+- **Status:** concluída
 - **Modo:** desenvolvimento
 - **Complexidade:** minor
 - **Data de criação:** 2026-04-30
@@ -186,11 +186,11 @@ O ANFIS precisa de dados rotulados para treinamento. O FIS Mamdani serve como or
 - **Impacto em funcionalidades existentes:** nenhum
 
 #### Critérios de Aceite (!obrigatório)
-- [ ] Mínimo de 1.000 amostras no dataset
-- [ ] Cobertura uniforme dos 5 universos de discurso (temperatura, umidade, chuva, vento, delta_t)
-- [ ] 4 colunas de output correspondentes aos consequentes (sp, wh, ir, bp)
-- [ ] Inputs e outputs normalizados em [0, 1]
-- [ ] Arquivo salvo em `data/raw/mamdani_dataset.csv`
+- [x] Mínimo de 1.000 amostras no dataset
+- [x] Cobertura uniforme dos 5 universos de discurso (temperatura, umidade, chuva, vento, delta_t)
+- [x] 4 colunas de output correspondentes aos consequentes (sp, wh, ir, bp)
+- [x] Inputs e outputs normalizados em [0, 1]
+- [x] Arquivo salvo em `data/raw/mamdani_dataset.csv`
 
 #### Restrições (opcional)
 Tratar exceções do FIS para combinações extremas de input — descartar amostras inválidas.
@@ -199,14 +199,14 @@ Tratar exceções do FIS para combinações extremas de input — descartar amos
 
 | Data | Sessão | Ação Realizada | Status ao Final |
 |------|--------|----------------|-----------------|
-| — | — | — | — |
+| 2026-05-07 | 1 | Script generate_dataset.py criado, dataset gerado (1012 amostras) | concluída |
 
 #### Resultado (preenchido ao concluir)
-- **Data de conclusão:** —
-- **Branch:** —
-- **Commit(s):** —
-- **Avaliação pós-implementação:** —
-- **Observações:** —
+- **Data de conclusão:** 2026-05-07
+- **Branch:** dev
+- **Commit(s):** feat(data): add training dataset generator for ANFIS
+- **Avaliação pós-implementação:** aprovado
+- **Observações:** 12 combinações de borda descartadas (NaN outputs). Dataset final: 1012 amostras, 9 colunas normalizadas.
 
 ## Tasks Concluídas
 

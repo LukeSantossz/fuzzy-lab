@@ -29,23 +29,23 @@
 | 9 | 2026-04-25 | TASK-009 — Scaffold ANFIS | minor | 5 arquivos — anfis | aprovado | Stubs NotImplementedError |
 | 10 | 2026-05-07 | TASK-000 — Bootstrap .claude | major | 2 arquivos — .claude | aprovado | Hooks instalados, histórico sincronizado |
 | 11 | 2026-05-07 | TASK-011 — Limpeza estrutura | minor | 6 arquivos — src, tests, docs | aprovado | 3 vazios deletados, CLAUDE.md simplificado |
+| 12 | 2026-05-07 | TASK-010 — Dataset treinamento | minor | 2 arquivos — scripts, data | aprovado | 1012 amostras, checklist agêntico aplicado |
 
 ## Estado da Codebase
 
 > Atualizado a cada implementação ou verificação pós-pull. Reflete o snapshot mais recente do projeto.
 
 - **Última atualização:** 2026-05-07
-- **Último responsável:** agente (sessão bootstrap)
+- **Último responsável:** agente (sessão TASK-010)
 - **Branch ativa:** dev
 - **Dependências alteradas recentemente:** nenhuma
 - **Testes passando:** sim — 24 testes (pytest)
 - **Divergências externas pendentes:** nenhuma
-- **Última task concluída:** TASK-011 — Limpeza estrutura
+- **Última task concluída:** TASK-010 — Dataset treinamento ANFIS
 
 ## Pendências Conhecidas
 
-- TASK-010 pendente — Dataset de treinamento a partir do FIS Mamdani
-- Arquivo `requirements.txt` deletado (usar `pip install -e .` conforme pyproject.toml)
+- Próximo passo: implementar treinamento ANFIS usando dataset gerado
 - Warnings de depreciação no skfuzzy (np.maximum com >2 args)
 
 ## Decisões Técnicas Relevantes
