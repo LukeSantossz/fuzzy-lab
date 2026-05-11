@@ -35,17 +35,18 @@
 
 > Atualizado a cada implementação ou verificação pós-pull. Reflete o snapshot mais recente do projeto.
 
-- **Última atualização:** 2026-05-07
-- **Último responsável:** agente (sessão TASK-010)
+- **Última atualização:** 2026-05-10
+- **Último responsável:** agente (sessão de sincronização de tasks)
 - **Branch ativa:** dev
 - **Dependências alteradas recentemente:** nenhuma
 - **Testes passando:** sim — 24 testes (pytest)
 - **Divergências externas pendentes:** nenhuma
-- **Última task concluída:** TASK-010 — Dataset treinamento ANFIS
+- **Última task concluída:** TASK-011 — Limpeza estrutura
+- **Próxima task ativa:** TASK-012 — Download e preparação dataset Kaggle
 
 ## Pendências Conhecidas
 
-- Próximo passo: implementar treinamento ANFIS usando dataset gerado
+- **Sprint 2 (ANFIS):** 5 tasks pendentes (TASK-012 a TASK-016)
 - Warnings de depreciação no skfuzzy (np.maximum com >2 args)
 
 ## Decisões Técnicas Relevantes
@@ -58,6 +59,8 @@
 | 2026-04-15 | Rule registry em mamdani.py | Permite seleção de subconjuntos de regras via config["rule_groups"] |
 | 2026-04-15 | Variáveis em português | Domínio agrícola brasileiro, consistência com terminologia técnica local |
 | 2026-04-25 | ANFIS espelha interface FIS | Mesma API (build_system, run_inference) para troca transparente |
+| 2026-05-10 | Dataset Kaggle para treino ANFIS | "Crop Health and Environmental Stress" (212k amostras) substitui dataset sintético para melhor generalização |
+| 2026-05-10 | Delta T calculado via fórmula | Dataset Kaggle não possui Delta T direto; será derivado de temperatura e umidade |
 
 ## Padrões Recorrentes Observados
 
@@ -72,3 +75,4 @@
 > Espaço para anotações pontuais sobre contextos que influenciam futuras sessões.
 
 - **2026-05-07:** Bootstrap do sistema `.claude/`. Histórico migrado do CLAUDE.md. Hooks instalados.
+- **2026-05-10:** Sincronização de tasks com `fuzzy_lab_tasks.md` (Notion). Tasks 11-14 do Notion mapeadas para TASK-012 a TASK-016. Decisão de usar dataset Kaggle "Crop Health and Environmental Stress" para treinamento do ANFIS em vez de apenas dados sintéticos.
