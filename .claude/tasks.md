@@ -138,6 +138,71 @@ O dataset sintético gerado pelo FIS Mamdani (TASK-010) possui apenas 1012 amost
 
 ---
 
+### TASK-017
+- **Status:** pendente
+- **Modo:** desenvolvimento
+- **Complexidade:** minor
+- **Data de criação:** 2026-05-12
+
+#### Objetivo (!obrigatório)
+Corrigir bugs e melhorar estabilidade numérica do ANFIS conforme findings do Codex review.
+
+#### Contexto (!obrigatório)
+O Codex review da TASK-013 identificou bugs de estabilidade, gaps de testes e inconsistências de API. Esta task consolida todas as correções necessárias para tornar o ANFIS robusto antes do treinamento (TASK-014).
+
+#### Escopo Técnico (!obrigatório)
+- **Arquivos/módulos envolvidos:**
+  - `src/fuzzylab/anfis/layers.py` (correções de estabilidade)
+  - `src/fuzzylab/anfis/anfis.py` (correções de API)
+  - `src/fuzzylab/anfis/engine.py` (documentação de decisões)
+  - `tests/test_anfis.py` (testes adicionais)
+- **Dependências necessárias:** nenhuma
+- **Impacto em funcionalidades existentes:** correções internas, interface pública mantida
+
+#### Critérios de Aceite (!obrigatório)
+
+**Bugs críticos:**
+- [ ] `GaussianMFLayer._init_parameters()` não divide por zero quando `n_mfs == 1`
+- [ ] `NormalizationLayer` retorna distribuição válida quando firing strengths underflow para zero
+- [ ] `sigmas` parametrizados via `softplus(raw_sigma) + eps` para evitar valores negativos/zero
+
+**Qualidade PyTorch:**
+- [ ] Getters usam `.detach().clone()` em vez de `.data.clone()`
+- [ ] `torch.ones()` em `TSKConsequentLayer` passa `dtype=x.dtype`
+
+**Documentação:**
+- [ ] Docstring de `TSKConsequentLayer` corrigida (não faz weighting)
+- [ ] Arquitetura diagonal (n_rules = n_mfs) documentada em docstring de `AnfisNet`
+
+**Testes:**
+- [ ] Teste `n_mfs=1` passa sem erro
+- [ ] Teste de backward-pass confirma gradientes finitos
+- [ ] Teste de normalização com firing zero retorna distribuição válida
+
+#### Restrições (opcional)
+- Manter interface pública `build_system()` e `run_inference()` inalterada
+- Não alterar arquitetura diagonal (decisão de design documentada)
+- Testes devem passar em < 30s
+
+#### Referências (opcional)
+- Codex review session: 2026-05-12
+- Jang (1993) ANFIS paper para referência de arquitetura
+
+#### Log de Andamento (atualizado pelo agente)
+
+| Data | Sessão | Ação Realizada | Status ao Final |
+|------|--------|----------------|-----------------|
+| —    | —      | —              | —               |
+
+#### Resultado (preenchido ao concluir)
+- **Data de conclusão:** [YYYY-MM-DD]
+- **Branch:** [nome da branch utilizada]
+- **Commit(s):** [hash ou mensagem]
+- **Avaliação pós-implementação:** [aprovado / aprovado com ressalvas / reprovado]
+- **Observações:** [notas relevantes para futuras tasks]
+
+---
+
 ### TASK-014
 - **Status:** pendente
 - **Modo:** desenvolvimento
