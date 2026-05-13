@@ -33,3 +33,8 @@ Thumbs.db
 # Miscellaneous
 tutor.md
 review.md
+
+# Data (large files - download via scripts/)
+data/raw/*.csv
+data/processed/*.csv
+!data/*/.gitkeep
