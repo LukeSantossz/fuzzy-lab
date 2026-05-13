@@ -1,23 +1,30 @@
-"""ANFIS network architecture — placeholder for PyTorch-based neuro-fuzzy model.
+"""ANFIS network architecture — PyTorch-based neuro-fuzzy model.
 
-This module will contain the Adaptive Neuro-Fuzzy Inference System (ANFIS)
-implementation using PyTorch. The architecture combines fuzzy logic with
-neural network learning capabilities.
+This module implements the Adaptive Neuro-Fuzzy Inference System (ANFIS)
+following Jang (1993). The architecture combines fuzzy logic with neural
+network learning capabilities through 5 layers:
 
-Note
-----
-This is a placeholder module. The actual implementation is pending.
+1. Fuzzification (Gaussian MFs)
+2. Rule firing strengths (T-norm product)
+3. Normalization
+4. TSK consequents (first-order linear)
+5. Defuzzification (weighted sum)
 """
 
 from __future__ import annotations
 
-try:
-    import torch
-    import torch.nn as nn
-except ImportError as e:
-    raise ImportError(
-        "PyTorch is required for ANFIS. Install with: pip install -r requirements-anfis.txt"
-    ) from e
+from typing import Mapping
+
+import torch
+import torch.nn as nn
+
+from fuzzylab.anfis.layers import (
+    DefuzzificationLayer,
+    GaussianMFLayer,
+    NormalizationLayer,
+    RuleFiringLayer,
+    TSKConsequentLayer,
+)
 
 
 class AnfisNet(nn.Module):
@@ -27,14 +34,23 @@ class AnfisNet(nn.Module):
     learning capabilities of neural networks with the interpretability
     of fuzzy inference systems.
 
+    Architecture Note
+    -----------------
+    This implementation uses a **diagonal rule architecture** where
+    n_rules = n_mfs, not the full cartesian grid (n_mfs^n_inputs).
+    Rule i uses membership function i from each input variable.
+    This reduces parameters from O(n_mfs^n_inputs) to O(n_mfs) and
+    works well when MFs are semantically aligned across inputs
+    (e.g., "low", "medium", "high" for all variables).
+
     Parameters
     ----------
     n_inputs : int
-        Number of input variables.
+        Number of input variables (default: 5 for fuzzy-lab).
     n_mfs : int
-        Number of membership functions per input.
-    n_outputs : int, optional
-        Number of output variables. Default is 1.
+        Number of membership functions per input (default: 7).
+    n_outputs : int
+        Number of output variables (default: 4 for sp, wh, ir, bp).
 
     Attributes
     ----------
@@ -44,30 +60,28 @@ class AnfisNet(nn.Module):
         Number of membership functions per input.
     n_outputs : int
         Number of output variables.
-
-    Note
-    ----
-    This is a placeholder. The actual ANFIS layers are not yet implemented.
+    n_rules : int
+        Number of fuzzy rules (equals n_mfs in diagonal architecture).
     """
 
     def __init__(
         self,
-        n_inputs: int,
-        n_mfs: int,
-        n_outputs: int = 1,
+        n_inputs: int = 5,
+        n_mfs: int = 7,
+        n_outputs: int = 4,
     ) -> None:
-        """Initialize the ANFIS network.
-
-        Raises
-        ------
-        NotImplementedError
-            ANFIS module is not yet implemented.
-        """
+        """Initialize the ANFIS network with 5 layers."""
         super().__init__()
         self.n_inputs = n_inputs
         self.n_mfs = n_mfs
         self.n_outputs = n_outputs
-        raise NotImplementedError("AnfisNet is not yet implemented")
+        self.n_rules = n_mfs
+
+        self.layer1_fuzzify = GaussianMFLayer(n_inputs, n_mfs)
+        self.layer2_firing = RuleFiringLayer(n_inputs, n_mfs)
+        self.layer3_normalize = NormalizationLayer()
+        self.layer4_consequent = TSKConsequentLayer(n_inputs, self.n_rules, n_outputs)
+        self.layer5_defuzzify = DefuzzificationLayer()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Forward pass through the ANFIS network.
@@ -76,15 +90,110 @@ class AnfisNet(nn.Module):
         ----------
         x : torch.Tensor
             Input tensor of shape (batch_size, n_inputs).
+            Inputs should be normalized to [0, 1].
 
         Returns
         -------
         torch.Tensor
             Output tensor of shape (batch_size, n_outputs).
-
-        Raises
-        ------
-        NotImplementedError
-            ANFIS module is not yet implemented.
+            Outputs are in [0, 1] range (normalized).
         """
-        raise NotImplementedError("AnfisNet.forward is not yet implemented")
+        memberships = self.layer1_fuzzify(x)
+        firing = self.layer2_firing(memberships)
+        normalized_firing = self.layer3_normalize(firing)
+        rule_outputs = self.layer4_consequent(x, normalized_firing)
+        outputs = self.layer5_defuzzify(rule_outputs, normalized_firing)
+
+        return outputs
+
+    def get_premise_parameters(self) -> dict[str, torch.Tensor]:
+        """Get premise parameters (MF centers and sigmas).
+
+        Returns
+        -------
+        dict
+            Dictionary with 'centers' and 'sigmas' tensors.
+            Sigmas are the effective (positive) values, not raw parameters.
+        """
+        return {
+            "centers": self.layer1_fuzzify.centers.detach().clone(),
+            "sigmas": self.layer1_fuzzify.sigmas.detach().clone(),
+        }
+
+    def set_premise_parameters(
+        self,
+        centers: torch.Tensor | None = None,
+        sigmas: torch.Tensor | None = None,
+    ) -> None:
+        """Set premise parameters from external values.
+
+        Parameters
+        ----------
+        centers : torch.Tensor, optional
+            MF centers of shape (n_inputs, n_mfs).
+        sigmas : torch.Tensor, optional
+            MF widths of shape (n_inputs, n_mfs). Must be positive.
+            Internally converted to raw parameters via inverse softplus.
+        """
+        from fuzzylab.anfis.layers import _SIGMA_EPS
+
+        with torch.no_grad():
+            if centers is not None:
+                self.layer1_fuzzify.centers.copy_(centers)
+            if sigmas is not None:
+                clamped = torch.clamp(sigmas - _SIGMA_EPS, min=1e-6)
+                raw = torch.log(torch.exp(clamped) - 1 + 1e-8)
+                self.layer1_fuzzify._raw_sigmas.copy_(raw)
+
+    def get_consequent_parameters(self) -> torch.Tensor:
+        """Get TSK consequent coefficients.
+
+        Returns
+        -------
+        torch.Tensor
+            Coefficients of shape (n_rules, n_outputs, n_inputs + 1).
+        """
+        return self.layer4_consequent.coeffs.detach().clone()
+
+    def set_consequent_parameters(self, coeffs: torch.Tensor) -> None:
+        """Set TSK consequent coefficients.
+
+        Parameters
+        ----------
+        coeffs : torch.Tensor
+            Coefficients of shape (n_rules, n_outputs, n_inputs + 1).
+        """
+        with torch.no_grad():
+            self.layer4_consequent.coeffs.copy_(coeffs)
+
+    @classmethod
+    def from_config(cls, config: Mapping[str, object] | None = None) -> "AnfisNet":
+        """Create AnfisNet from configuration dict.
+
+        Parameters
+        ----------
+        config : mapping, optional
+            Configuration with keys:
+            - n_inputs (int): Number of inputs (default: 5)
+            - n_mfs (int): MFs per input (default: 7)
+            - n_outputs (int): Number of outputs (default: 4)
+            - weights_path (str): Path to load pretrained weights
+
+        Returns
+        -------
+        AnfisNet
+            Configured network instance.
+        """
+        cfg = dict(config) if config else {}
+        n_inputs = cfg.get("n_inputs", 5)
+        n_mfs = cfg.get("n_mfs", 7)
+        n_outputs = cfg.get("n_outputs", 4)
+
+        model = cls(n_inputs=n_inputs, n_mfs=n_mfs, n_outputs=n_outputs)
+
+        weights_path = cfg.get("weights_path")
+        if weights_path:
+            state_dict = torch.load(weights_path, map_location="cpu", weights_only=True)
+            model.load_state_dict(state_dict)
+
+        return model
