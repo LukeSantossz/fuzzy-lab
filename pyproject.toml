@@ -13,6 +13,8 @@ dependencies = [
     "scikit-fuzzy",
     "torch",
     "matplotlib",
+    "pandas",
+    "kaggle",
 ]
 
 [project.optional-dependencies]
