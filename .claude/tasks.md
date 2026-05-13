@@ -514,7 +514,7 @@ Implementar a arquitetura ANFIS completa em PyTorch seguindo a estrutura de 5 la
 #### Resultado
 - **Data de conclusão:** 2026-05-12
 - **Branch:** dev
-- **Commit(s):** pendente (trabalho não commitado)
+- **Commit(s):** `754ca65 feat(anfis): implement 5-layer ANFIS architecture following Jang (1993)`
 - **Avaliação pós-implementação:** aprovado
 - **Observações:** 5 layers implementados (GaussianMF, RuleFiring, Normalization, TSKConsequent, Defuzzification). Função `initialize_from_mamdani()` para inicialização a partir do FIS. 10 testes ANFIS passando.
 
