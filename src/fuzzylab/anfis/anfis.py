@@ -34,6 +34,15 @@ class AnfisNet(nn.Module):
     learning capabilities of neural networks with the interpretability
     of fuzzy inference systems.
 
+    Architecture Note
+    -----------------
+    This implementation uses a **diagonal rule architecture** where
+    n_rules = n_mfs, not the full cartesian grid (n_mfs^n_inputs).
+    Rule i uses membership function i from each input variable.
+    This reduces parameters from O(n_mfs^n_inputs) to O(n_mfs) and
+    works well when MFs are semantically aligned across inputs
+    (e.g., "low", "medium", "high" for all variables).
+
     Parameters
     ----------
     n_inputs : int
@@ -52,7 +61,7 @@ class AnfisNet(nn.Module):
     n_outputs : int
         Number of output variables.
     n_rules : int
-        Number of fuzzy rules (equals n_mfs in simplified architecture).
+        Number of fuzzy rules (equals n_mfs in diagonal architecture).
     """
 
     def __init__(
@@ -104,10 +113,11 @@ class AnfisNet(nn.Module):
         -------
         dict
             Dictionary with 'centers' and 'sigmas' tensors.
+            Sigmas are the effective (positive) values, not raw parameters.
         """
         return {
-            "centers": self.layer1_fuzzify.centers.data.clone(),
-            "sigmas": self.layer1_fuzzify.sigmas.data.clone(),
+            "centers": self.layer1_fuzzify.centers.detach().clone(),
+            "sigmas": self.layer1_fuzzify.sigmas.detach().clone(),
         }
 
     def set_premise_parameters(
@@ -122,13 +132,18 @@ class AnfisNet(nn.Module):
         centers : torch.Tensor, optional
             MF centers of shape (n_inputs, n_mfs).
         sigmas : torch.Tensor, optional
-            MF widths of shape (n_inputs, n_mfs).
+            MF widths of shape (n_inputs, n_mfs). Must be positive.
+            Internally converted to raw parameters via inverse softplus.
         """
+        from fuzzylab.anfis.layers import _SIGMA_EPS
+
         with torch.no_grad():
             if centers is not None:
                 self.layer1_fuzzify.centers.copy_(centers)
             if sigmas is not None:
-                self.layer1_fuzzify.sigmas.copy_(sigmas)
+                clamped = torch.clamp(sigmas - _SIGMA_EPS, min=1e-6)
+                raw = torch.log(torch.exp(clamped) - 1 + 1e-8)
+                self.layer1_fuzzify._raw_sigmas.copy_(raw)
 
     def get_consequent_parameters(self) -> torch.Tensor:
         """Get TSK consequent coefficients.
@@ -138,7 +153,7 @@ class AnfisNet(nn.Module):
         torch.Tensor
             Coefficients of shape (n_rules, n_outputs, n_inputs + 1).
         """
-        return self.layer4_consequent.coeffs.data.clone()
+        return self.layer4_consequent.coeffs.detach().clone()
 
     def set_consequent_parameters(self, coeffs: torch.Tensor) -> None:
         """Set TSK consequent coefficients.

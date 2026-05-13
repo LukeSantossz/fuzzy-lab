@@ -134,3 +134,67 @@ def test_initialize_from_mamdani_forward_pass():
 
     assert y.shape == (1, 4)
     assert not torch.isnan(y).any()
+
+
+def test_anfis_n_mfs_one():
+    """Verify AnfisNet works with n_mfs=1 (edge case, no division by zero)."""
+    from fuzzylab.anfis import AnfisNet
+
+    model = AnfisNet(n_inputs=3, n_mfs=1, n_outputs=2)
+
+    assert model.n_mfs == 1
+    assert model.n_rules == 1
+
+    x = torch.rand(4, 3)
+    y = model(x)
+
+    assert y.shape == (4, 2)
+    assert not torch.isnan(y).any()
+    assert not torch.isinf(y).any()
+
+
+def test_anfis_backward_pass_finite_gradients():
+    """Verify backward pass produces finite gradients for all parameters."""
+    from fuzzylab.anfis import AnfisNet
+
+    model = AnfisNet(n_inputs=5, n_mfs=7, n_outputs=4)
+    x = torch.rand(8, 5)
+
+    y = model(x)
+    loss = y.sum()
+    loss.backward()
+
+    for name, param in model.named_parameters():
+        assert param.grad is not None, f"No gradient for {name}"
+        assert torch.isfinite(param.grad).all(), f"Non-finite gradient for {name}"
+
+
+def test_normalization_zero_firing_returns_uniform():
+    """Verify NormalizationLayer returns uniform distribution when firing is zero."""
+    from fuzzylab.anfis.layers import NormalizationLayer
+
+    layer = NormalizationLayer()
+
+    zero_firing = torch.zeros(2, 5)
+    normalized = layer(zero_firing)
+
+    assert normalized.shape == (2, 5)
+    assert torch.allclose(normalized.sum(dim=1), torch.ones(2))
+    assert torch.allclose(normalized, torch.full((2, 5), 0.2))
+
+
+def test_sigmas_always_positive():
+    """Verify sigmas are always positive regardless of raw parameter values."""
+    from fuzzylab.anfis import AnfisNet
+
+    model = AnfisNet(n_inputs=3, n_mfs=5, n_outputs=2)
+
+    with torch.no_grad():
+        model.layer1_fuzzify._raw_sigmas.fill_(-100.0)
+
+    sigmas = model.layer1_fuzzify.sigmas
+    assert (sigmas > 0).all(), "Sigmas must be positive"
+
+    x = torch.rand(2, 3)
+    y = model(x)
+    assert not torch.isnan(y).any()
