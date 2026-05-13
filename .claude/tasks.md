@@ -85,7 +85,7 @@ A complexidade determina o nível de cerimônia na avaliação pós-implementaç
 > **Regra de ordenação:** A primeira task listada é a task ativa. O agente trabalha nela até conclusão, descarte ou bloqueio explícito pelo usuário. Para mudar a prioridade, o usuário reordena as tasks nesta seção.
 
 ### TASK-012
-- **Status:** pendente
+- **Status:** pausada
 - **Modo:** desenvolvimento
 - **Complexidade:** minor
 - **Data de criação:** 2026-05-10
@@ -127,69 +127,14 @@ O dataset sintético gerado pelo FIS Mamdani (TASK-010) possui apenas 1012 amost
 
 | Data | Sessão | Ação Realizada | Status ao Final |
 |------|--------|----------------|-----------------|
-| —    | —      | —              | —               |
+| 2026-05-12 | 1 | Scripts implementados (download_kaggle_dataset.py, prepare_kaggle_dataset.py). Dataset baixado (212k linhas). Processamento pendente. | pausada |
 
 #### Resultado (preenchido ao concluir)
 - **Data de conclusão:** [YYYY-MM-DD]
 - **Branch:** [nome da branch utilizada]
 - **Commit(s):** [hash ou mensagem]
 - **Avaliação pós-implementação:** [aprovado / aprovado com ressalvas / reprovado]
-- **Observações:** [notas relevantes para futuras tasks]
-
----
-
-### TASK-013
-- **Status:** pendente
-- **Modo:** desenvolvimento
-- **Complexidade:** major
-- **Data de criação:** 2026-05-10
-
-#### Objetivo (!obrigatório)
-Implementar a arquitetura ANFIS completa em PyTorch seguindo a estrutura de 5 layers de Jang (1993).
-
-#### Contexto (!obrigatório)
-O scaffold do ANFIS (TASK-009) possui apenas stubs com `NotImplementedError`. Esta task implementa a arquitetura real: Layer 1 (fuzzificação), Layer 2 (firing strengths), Layer 3 (normalização), Layer 4 (consequentes), Layer 5 (defuzzificação). O modelo será inicializado com parâmetros do FIS Mamdani para acelerar convergência.
-
-#### Escopo Técnico (!obrigatório)
-- **Arquivos/módulos envolvidos:**
-  - `src/fuzzylab/anfis/anfis.py` (implementar `AnfisNet`)
-  - `src/fuzzylab/anfis/layers.py` (novo — layers individuais)
-  - `src/fuzzylab/anfis/__init__.py` (atualizar exports)
-- **Dependências necessárias:** `torch` (já listado em pyproject.toml)
-- **Impacto em funcionalidades existentes:** substitui stubs por implementação real
-
-#### Critérios de Aceite (!obrigatório)
-- [ ] Classe `AnfisNet(nn.Module)` com 5 layers implementados
-- [ ] Layer 1: Gaussian MFs parametrizadas (centro, sigma) para cada input
-- [ ] Layer 2: Produto das ativações (firing strength de cada regra)
-- [ ] Layer 3: Normalização dos firing strengths
-- [ ] Layer 4: Consequentes TSK de primeira ordem (parâmetros lineares)
-- [ ] Layer 5: Soma ponderada para defuzzificação
-- [ ] Forward pass executando sem erros para batch_size arbitrário
-- [ ] Premise parameters inicializáveis a partir do FIS Mamdani
-- [ ] `build_system()` retornando instância de `AnfisNet`
-
-#### Restrições (opcional)
-- Manter interface compatível com FIS (`build_system`, `run_inference`)
-- Usar `torch.nn.Parameter` para parâmetros treináveis
-- Suportar GPU (device-agnostic)
-
-#### Referências (opcional)
-- Jang, J.-S. R. (1993). ANFIS: Adaptive-Network-Based Fuzzy Inference System
-- Task 11 do Notion (fuzzy_lab_tasks.md)
-
-#### Log de Andamento (atualizado pelo agente)
-
-| Data | Sessão | Ação Realizada | Status ao Final |
-|------|--------|----------------|-----------------|
-| —    | —      | —              | —               |
-
-#### Resultado (preenchido ao concluir)
-- **Data de conclusão:** [YYYY-MM-DD]
-- **Branch:** [nome da branch utilizada]
-- **Commit(s):** [hash ou mensagem]
-- **Avaliação pós-implementação:** [aprovado / aprovado com ressalvas / reprovado]
-- **Observações:** [notas relevantes para futuras tasks]
+- **Observações:** Pausada a pedido do usuário. Processamento com FIS Mamdani é demorado (~60k amostras). Retomar quando necessário para TASK-014.
 
 ---
 
@@ -554,6 +499,24 @@ Limpar estrutura do projeto removendo arquivos vazios e eliminando duplicação 
 - **Commit(s):** `e4b8af7`, `5041eaa`, `2e5645c`, `d99cdb4`
 - **Avaliação pós-implementação:** aprovado
 - **Observações:** 24 testes passando. CLAUDE.md reduzido de 317 para 78 linhas.
+
+---
+
+### TASK-013
+- **Status:** concluída
+- **Modo:** desenvolvimento
+- **Complexidade:** major
+- **Data de criação:** 2026-05-10
+
+#### Objetivo
+Implementar a arquitetura ANFIS completa em PyTorch seguindo a estrutura de 5 layers de Jang (1993).
+
+#### Resultado
+- **Data de conclusão:** 2026-05-12
+- **Branch:** dev
+- **Commit(s):** pendente (trabalho não commitado)
+- **Avaliação pós-implementação:** aprovado
+- **Observações:** 5 layers implementados (GaussianMF, RuleFiring, Normalization, TSKConsequent, Defuzzification). Função `initialize_from_mamdani()` para inicialização a partir do FIS. 10 testes ANFIS passando.
 
 ---
 

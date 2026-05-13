@@ -30,23 +30,25 @@
 | 10 | 2026-05-07 | TASK-000 — Bootstrap .claude | major | 2 arquivos — .claude | aprovado | Hooks instalados, histórico sincronizado |
 | 11 | 2026-05-07 | TASK-011 — Limpeza estrutura | minor | 6 arquivos — src, tests, docs | aprovado | 3 vazios deletados, CLAUDE.md simplificado |
 | 12 | 2026-05-07 | TASK-010 — Dataset treinamento | minor | 2 arquivos — scripts, data | aprovado | 1012 amostras, checklist agêntico aplicado |
+| 13 | 2026-05-12 | TASK-013 — Arquitetura ANFIS | major | 4 arquivos — anfis | aprovado | 5 layers Jang (1993), 10 testes passando |
 
 ## Estado da Codebase
 
 > Atualizado a cada implementação ou verificação pós-pull. Reflete o snapshot mais recente do projeto.
 
-- **Última atualização:** 2026-05-10
-- **Último responsável:** agente (sessão de sincronização de tasks)
+- **Última atualização:** 2026-05-12
+- **Último responsável:** agente (sessão TASK-013)
 - **Branch ativa:** dev
 - **Dependências alteradas recentemente:** nenhuma
-- **Testes passando:** sim — 24 testes (pytest)
-- **Divergências externas pendentes:** nenhuma
-- **Última task concluída:** TASK-011 — Limpeza estrutura
-- **Próxima task ativa:** TASK-012 — Download e preparação dataset Kaggle
+- **Testes passando:** sim — 31 testes (pytest: 21 FIS + 10 ANFIS)
+- **Divergências externas pendentes:** trabalho não commitado (TASK-012 parcial + TASK-013)
+- **Última task concluída:** TASK-013 — Arquitetura ANFIS
+- **Próxima task ativa:** TASK-014 — Loop de treinamento (bloqueada por TASK-012)
 
 ## Pendências Conhecidas
 
-- **Sprint 2 (ANFIS):** 5 tasks pendentes (TASK-012 a TASK-016)
+- **Sprint 2 (ANFIS):** TASK-012 (pausada), TASK-014/015/016 (bloqueadas por dataset)
+- **Trabalho não commitado:** TASK-012 (scripts + download) e TASK-013 (arquitetura ANFIS)
 - Warnings de depreciação no skfuzzy (np.maximum com >2 args)
 
 ## Decisões Técnicas Relevantes
