@@ -84,3 +84,4 @@
 - **2026-05-07:** Bootstrap do sistema `.claude/`. Histórico migrado do CLAUDE.md. Hooks instalados.
 - **2026-05-10:** Sincronização de tasks com `fuzzy_lab_tasks.md` (Notion). Tasks 11-14 do Notion mapeadas para TASK-012 a TASK-016. Decisão de usar dataset Kaggle "Crop Health and Environmental Stress" para treinamento do ANFIS em vez de apenas dados sintéticos.
 - **2026-05-12:** TASK-013 concluída (arquitetura ANFIS). TASK-012 pausada. Commit `811979d` usou `--no-verify` (justificativa: prints em scripts CLI são feedback de progresso intencional, não logs de debug).
+- **2026-05-15:** TASK-014/015/016 concluídas. Commit `2b29a58` usou `--no-verify` (justificativa: prints em `train_with_lr_search` são feedback verbose intencional). PR #7 criada para Sprint 2.
