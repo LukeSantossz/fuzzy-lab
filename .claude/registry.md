@@ -32,24 +32,28 @@
 | 12 | 2026-05-07 | TASK-010 — Dataset treinamento | minor | 2 arquivos — scripts, data | aprovado | 1012 amostras, checklist agêntico aplicado |
 | 13 | 2026-05-12 | TASK-013 — Arquitetura ANFIS | major | 4 arquivos — anfis | aprovado | 5 layers Jang (1993), 10 testes passando |
 | 14 | 2026-05-12 | TASK-017 — Correções estabilidade ANFIS | minor | 3 arquivos — anfis, tests | aprovado | Codex review findings corrigidos, 14 testes ANFIS |
+| 15 | 2026-05-15 | TASK-014 — Loop de treinamento ANFIS | major | 3 arquivos — anfis, tests, notebooks | aprovado c/ ressalvas | training.py + notebook + 9 testes |
+| 16 | 2026-05-15 | TASK-015 — Validação ANFIS vs Mamdani | minor | 3 arquivos — anfis, tests, notebooks | aprovado c/ ressalvas | evaluation.py + 9 testes |
+| 17 | 2026-05-15 | TASK-016 — Testes finais ANFIS | minor | 1 arquivo — tests | aprovado | 3 testes integração, 56 total |
 
 ## Estado da Codebase
 
 > Atualizado a cada implementação ou verificação pós-pull. Reflete o snapshot mais recente do projeto.
 
-- **Última atualização:** 2026-05-12
-- **Último responsável:** agente (sessão TASK-017)
+- **Última atualização:** 2026-05-15
+- **Último responsável:** agente (sessão TASK-016)
 - **Branch ativa:** dev
 - **Dependências alteradas recentemente:** nenhuma
-- **Testes passando:** sim — 35 testes (pytest: 21 FIS + 14 ANFIS)
-- **Divergências externas pendentes:** trabalho TASK-017 não commitado
-- **Última task concluída:** TASK-017 — Correções estabilidade ANFIS
-- **Próxima task ativa:** TASK-014 — Loop de treinamento (bloqueada por TASK-012)
+- **Testes passando:** sim — 56 testes (pytest: 21 FIS + 35 ANFIS, 1 skipped)
+- **Divergências externas pendentes:** TASK-014/015/016/017 não commitados
+- **Última task concluída:** TASK-016 — Testes finais ANFIS
+- **Próxima task ativa:** nenhuma — Sprint 2 estruturalmente completo
 
 ## Pendências Conhecidas
 
-- **Sprint 2 (ANFIS):** TASK-012 (pausada), TASK-014/015/016 (bloqueadas por dataset)
-- **Trabalho não commitado:** TASK-017 (correções estabilidade)
+- **Sprint 2 (ANFIS):** Estrutura completa. TASK-012 (dataset Kaggle) pausada.
+- **Trabalho não commitado:** TASK-014/015/016/017
+- **Execução pendente:** Treinamento real com dataset maior (MSE < 0.05, R² > 0.90)
 - Warnings de depreciação no skfuzzy (np.maximum com >2 args)
 
 ## Decisões Técnicas Relevantes
