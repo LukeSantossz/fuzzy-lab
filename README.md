@@ -1,61 +1,48 @@
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python&logoColor=white)
 ![scikit-fuzzy](https://img.shields.io/badge/scikit--fuzzy-Mamdani-success)
 ![PyTorch](https://img.shields.io/badge/PyTorch-ANFIS-EE4C2C?logo=pytorch&logoColor=white)
-![Status](https://img.shields.io/badge/status-in%20development-yellow)
+![License](https://img.shields.io/badge/license-MIT-green)
 
-# fuzzy-lab
+# fuzzy-lab — Agricultural decision support with fuzzy logic
 
-> Agricultural decision-support using fuzzy logic (IF–THEN rules), Mamdani FIS, ANFIS, and time-series analysis for spray windows, water stress, irrigation hints, and yield estimates driven by weather variables.
+Weather-driven IF–THEN inference for spray windows, water stress, irrigation hints, and yield estimates.
 
-## Overview
+## What It Does
 
-Precision agriculture couples climate variables with operational limits (wind, humidity, rainfall, delta T). Crisp models are often too rigid; **fuzzy inference systems** encode uncertainty and field-aligned linguistic rules. This repository is a modular Python package: **Mamdani FIS** with [scikit-fuzzy](https://pythonhosted.org/scikit-fuzzy/), **ANFIS** with PyTorch, and a **time-series** layer (Pandas / tslearn), plus Jupyter notebooks for experiments and pytest for tests.
+Turns weather variables (temperature, humidity, rainfall, wind, delta T) into agronomic recommendations:
+
+- Recommends a spray window (`proibida` / `atencao` / `janela_disponivel`) from delta T, wind, rain, humidity, and temperature.
+- Estimates water stress and derives an irrigation hint (`desnecessaria` / `opcional` / `recomendada`).
+- Estimates relative productivity (`baixa` / `medio` / `alta`).
+- Exposes a single programmatic entry point: `build_system()` + `run_inference()`.
+
+## What It Is
+
+A modular **Python library and research codebase** (import name `fuzzylab`) for fuzzy inference in precision agriculture. It produces crisp, defuzzified recommendations from fuzzy IF–THEN rules, addressing the rigidity of crisp threshold models when weather variables interact near operational limits. The active core is a Mamdani FIS (scikit-fuzzy); a PyTorch ANFIS and a time-series layer are scaffolded.
 
 ## Tech Stack
 
 | Layer | Technology |
 |-------|------------|
-| Fuzzy inference | [scikit-fuzzy](https://pythonhosted.org/scikit-fuzzy/) (Mamdani), NumPy |
+| Language | Python 3.10+ |
+| Fuzzy inference | scikit-fuzzy (Mamdani), NumPy |
 | Neuro-fuzzy | PyTorch (ANFIS) |
 | Time series | Pandas, tslearn |
 | Testing | pytest |
 | Experimentation | Jupyter Notebook |
 | Visualization | matplotlib |
 
-## FIS linguistic domain
+## Architecture
 
-**Antecedents (inputs):**
+`src/`-layout package split by feature: `fuzzylab.fis` (active Mamdani system), `fuzzylab.anfis` (neuro-fuzzy, scaffolded), and `fuzzylab.timeseries` (placeholder). The Mamdani flow:
 
-| Variable | Universe | Sets (summary) |
-|----------|----------|----------------|
-| Temperature | 0–60 °C | frio_extremo → crítico (7) |
-| Humidity | 0–100 % | deserto → condensação (7) |
-| Rainfall | 0–500 mm | seco → extrema (7) |
-| Wind | 0–150 km/h | calmo → tempestade (7) |
-| Delta T | 0–40 °C | inversão_térmica → extremo (7) |
-
-**Consequents (outputs):** spray recommendation `sp` (proibida / atencao / janela_disponivel), water stress `wh` (baixo / medio / alto), irrigation recommendation `ir` (desnecessaria / opcional / recomendada), estimated productivity `bp` (baixa / medio / alta).
-
-**Public interface** (re-exported from `fuzzylab.fis`):
-
-```python
-from fuzzylab.fis import build_system, run_inference
-
-system = build_system()
-outputs = run_inference(
-    system,
-    {
-        "Temperatura": 28.0,
-        "Umidade": 60.0,
-        "Chuva": 0.0,
-        "Vento": 10.0,
-        "Delta T": 8.0,
-    },
-)
-# outputs -> {"wh": ..., "ir": ..., "sp": ..., "bp": ...}
+```mermaid
+flowchart LR
+    I["5 antecedents<br/>(Temperatura, Umidade, Chuva, Vento, Delta T)"] --> R["Rule groups<br/>(spray · water_stress · irrigation · productivity)"]
+    R --> O["4 consequents<br/>(sp · wh · ir · bp)"]
 ```
 
-`build_system(config)` optionally accepts `{"rule_groups": [...]}` to include only a subset of rule builders (`spray`, `water_stress`, `irrigation`, `productivity`, `combined`).
+`build_system(config)` assembles a `ControlSystemSimulation` from the selected rule groups; `run_inference(system, inputs)` computes and returns the defuzzified outputs. Each antecedent uses 7 membership functions (`automf`), and rule groups are independently selectable via `config={"rule_groups": [...]}`.
 
 ## Getting Started
 
@@ -68,20 +55,15 @@ outputs = run_inference(
 ### Installation
 
 ```bash
-# Clone the repository
-git clone https://github.com/<username>/fuzzy-lab.git
+git clone https://github.com/LukeSantossz/fuzzy-lab.git
 cd fuzzy-lab
 
-# Create and activate a virtual environment
 python -m venv venv
-source venv/bin/activate   # Linux / macOS
-venv\Scripts\activate      # Windows
+source venv/bin/activate     # Linux / macOS
+# venv\Scripts\activate      # Windows
 
-# Install dependencies
 pip install -r requirements.txt
-
-# Editable install (recommended — import name: fuzzylab)
-pip install -e .
+pip install -e .             # editable install; import name: fuzzylab
 ```
 
 Without `pip install -e .`, add `src` to `PYTHONPATH` or rely on the notebook snippet that prepends `.../src` to `sys.path`.
@@ -89,24 +71,23 @@ Without `pip install -e .`, add `src` to `PYTHONPATH` or rely on the notebook sn
 ### Running
 
 ```bash
-# Start the Jupyter server
-jupyter notebook
-
-# Main FIS experiment notebook:
-# notebooks/fis_mamdani.ipynb
-# (membership-function plots and 3D control surfaces are saved under notebooks/figures/)
+jupyter notebook             # main experiment: notebooks/fis_mamdani.ipynb
 ```
 
+Membership-function plots and 3D control surfaces are saved under `notebooks/figures/`.
+
+### Tests
+
 ```bash
-# Tests
 pytest tests/
 ```
 
+## API Reference
+
 ```python
-# Programmatic usage (no notebook required)
 from fuzzylab.fis import build_system, run_inference
 
-system = build_system()
+system = build_system()  # or build_system({"rule_groups": ["spray", "irrigation"]})
 outputs = run_inference(
     system,
     {"Temperatura": 28.0, "Umidade": 60.0, "Chuva": 0.0, "Vento": 10.0, "Delta T": 8.0},
@@ -114,68 +95,53 @@ outputs = run_inference(
 print(outputs)  # {"wh": ..., "ir": ..., "sp": ..., "bp": ...}
 ```
 
-**Environment variables:** the codebase does not require any at this stage. For PyTorch on GPU, follow upstream guidance (`CUDA_VISIBLE_DEVICES`, etc.) for your setup.
+Valid `rule_groups`: `spray`, `water_stress`, `irrigation`, `productivity`, `combined`. Inputs are keyed by antecedent name; outputs by consequent (`sp`, `wh`, `ir`, `bp`).
 
 ## Project Structure
 
 ```
 fuzzy-lab/
-├── notebooks/
-│   ├── fis_mamdani.ipynb          # Mamdani FIS experiments
-│   └── figures/                   # generated MF plots and control surfaces
-├── data/
-│   └── raw/                       # raw inputs (e.g. .gitkeep)
-├── src/
-│   └── fuzzylab/
-│       ├── fis/
-│       │   ├── mamdani.py         # Mamdani FIS module (scikit-fuzzy) — ACTIVE
-│       │   └── __init__.py        # re-exports build_system / run_inference
-│       ├── anfis/
-│       │   ├── anfis.py           # AnfisNet (nn.Module) — stub
-│       │   ├── engine.py          # build_system / run_inference — stub
-│       │   └── __init__.py        # re-exports public interface
-│       └── timeseries/            # time series (placeholder)
-├── tests/
-│   ├── test_fis.py                # FIS scenario tests (ideal, storm, drought)
-│   ├── test_anfis.py              # ANFIS import and stub tests
-│   └── test_mamdani_water_irrigation.py  # boundary and ordering tests
-├── pyproject.toml
-├── requirements.txt
-├── requirements-anfis.txt         # PyTorch deps for ANFIS module
-└── README.md
+├── src/fuzzylab/
+│   ├── fis/            # Mamdani FIS (scikit-fuzzy) — active
+│   ├── anfis/          # ANFIS (PyTorch) — scaffolded
+│   └── timeseries/     # time-series layer — placeholder
+├── tests/              # pytest suites
+├── notebooks/          # experiments + generated figures/
+├── scripts/            # dataset download / generation / preparation
+├── data/               # raw / processed / models (gitkept)
+└── .standards/         # development standards (git submodule)
 ```
 
-## Current Status
+## Project Status
 
-**Status: in development — Phase 1 complete**
+**In development — Mamdani FIS phase complete.**
 
-| Stage | Status |
-|-------|--------|
-| Linguistic antecedents and consequents | Done |
-| Membership functions (automf, 7 sets) | Done |
-| Full spray rules (`janela_disponivel`, `atencao`, `proibida`) | Done |
-| Modular package layout (`fis`, `anfis`, `timeseries`) | Done |
-| Rules for water stress and irrigation | Done |
-| Rules for productivity (`bet_productivity`, 7 rules) | Done |
-| Public interface `build_system` / `run_inference` (flat `mamdani.py`) | Done |
-| Membership-function plots and 3D control surfaces (notebook) | Done |
-| Unit tests for FIS scenarios (24 tests) | Done |
-| ANFIS subpackage scaffold (`AnfisNet`, stubs) | Done |
-| ANFIS training and inference implementation | Pending |
-| Time-series module implementation | Pending |
-| Calibrating universe bounds against regional climate data | Pending |
-| Calibrating productivity rules against field data | Pending |
+Done:
 
-**Next steps:**
+- [x] Linguistic antecedents/consequents with 7-set membership functions.
+- [x] Spray, water-stress, irrigation, and productivity rule groups.
+- [x] Public interface `build_system` / `run_inference`.
+- [x] FIS scenario unit tests, MF plots, and 3D control surfaces.
+- [x] ANFIS subpackage scaffold.
 
-1. Implement ANFIS forward pass and training loop.
-2. Implement time-series workflows and tie-ins to `data/raw/`.
-3. Revisit discourse universes using field data and agronomic references.
-4. Calibrate productivity rules against experimental yield datasets.
+Pending (tracked as issues):
 
-## Known issues
+- [ ] ANFIS forward pass and training loop ([#9](https://github.com/LukeSantossz/fuzzy-lab/issues/9)).
+- [ ] Time-series workflows and `data/raw/` tie-ins ([#10](https://github.com/LukeSantossz/fuzzy-lab/issues/10)).
+- [ ] Universe-bound calibration ([#11](https://github.com/LukeSantossz/fuzzy-lab/issues/11)).
+- [ ] Productivity-threshold calibration ([#12](https://github.com/LukeSantossz/fuzzy-lab/issues/12)).
 
-- Universe bounds (`np.arange`) should be checked against regional climate records and technical literature.
-- Productivity rules now cover 7 scenarios but their thresholds still need calibration against experimental yield data.
-- ANFIS subpackage is scaffolded with stubs; training and inference logic pending implementation.
-- Time-series module is placeholder only.
+## Known Issues & Limitations
+
+- Universe bounds (`np.arange`) are not yet validated against regional climate records or literature ([#11](https://github.com/LukeSantossz/fuzzy-lab/issues/11)).
+- Productivity rule thresholds cover 7 scenarios but are not calibrated against experimental yield data ([#12](https://github.com/LukeSantossz/fuzzy-lab/issues/12)).
+- The ANFIS subpackage is scaffolded with stubs; training and inference are not implemented ([#9](https://github.com/LukeSantossz/fuzzy-lab/issues/9)).
+- The time-series module is a placeholder ([#10](https://github.com/LukeSantossz/fuzzy-lab/issues/10)).
+
+## Contributing
+
+Fork, branch as `type/TASK-NNN-description`, write tests first (red-green-refactor), use Conventional Commits, and open a PR. Development standards live in the `.standards/` submodule — run `git submodule update --init --recursive` after cloning — and are summarized in `CLAUDE.md`.
+
+## License
+
+MIT — see [LICENSE](LICENSE).
